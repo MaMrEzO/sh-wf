@@ -11,13 +11,13 @@ This project just manipulate workflows in list style, in order and tree like bul
 |---|---|
 | `Enter` | new Workflow. |
 | `Ctrl+Enter` | make focused Workflow done. |
-| `Tab` | Change indent of Workflow forwarb. |
-| `Shift+Tab` | chage indent forward. |
-| `UpArrow`/`DownArrow` | navigate upward and downward between Workflos |
+| `Tab` | Change indent of Workflow forward. |
+| `Shift+Tab` | change indent forward. |
+| `UpArrow`/`DownArrow` | navigate upward and downward between Workflow |
 
 ## Todo
 - [ ] Store on add or delete to localStorage
-- [ ] Delete on empty title with `BackSpce` or `Ctrl+Shif+Delete`
+- [ ] Delete on empty title with `BackSpace` or `Ctrl+Shift+Delete`
 
 ## Known issuse
  - Navigation get confused on changeing indent backward items in middle of list! 

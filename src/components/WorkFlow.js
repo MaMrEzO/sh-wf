@@ -53,7 +53,7 @@ export function WorkFlowRow(props) {
 						else if (pwf.parentID === wfItem.parentID)
 							state.dispatcher(state.state.setWFItemParent(id, pwf.id));
 					} else {
-						console.info("pwfID is null!");
+						//console.info("pwfID is null!");
 					}
 				}
 				handled = true;
@@ -91,7 +91,7 @@ export function WorkFlowRow(props) {
 				}
 				break;
 			default:
-				console.log("Unhandled: ", e.keyCode)
+			//console.log("Unhandled: ", e.keyCode)
 		}
 		if (handled) {
 			e.preventDefault();

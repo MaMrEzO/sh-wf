@@ -2,6 +2,10 @@ import React from 'react';
 import {useEffect} from 'react';
 import './WorkFlow.css';
 
+/**
+ * A React.FC component to manipulate displaying of list of WorkflowItem's and tree under a WorkflowItem
+ * @property {Array} data Tree of WorkflowItem's, use WorkflowData.tree 
+ */
 export function WorkFlowBox(props) {
 	const {state} = props;
 	return (
@@ -22,6 +26,10 @@ export function WorkFlowBox(props) {
 	)
 }
 
+/**
+ * A React.FC component to manipulating a row of WorkflowItem.
+ * This component directly manage navigation, insertion and deletion of list.
+ */
 export function WorkFlowRow(props) {
 	const {item, state} = props;
 

@@ -48,6 +48,16 @@ function findIDIndex(list, id) {
 	return res;
 }
 
+/**
+ * WorkflowData
+ * The main class for manipulating workflows
+ *
+ * To instance a naw and empty WorkflowData just call new WorkflowData(),
+ *
+ * @param {WorkflowItem[]} data - List data of WorkflowItem's for new WorkflowData instance
+ * @param {React.RefObject<any>} focusedRef - Focused ref in app, ignore it if none
+ *
+ */
 class WorkflowData {
 	constructor(data, focusedRef) {
 		if (data !== null && data !== undefined && Array.isArray(data)) {
@@ -62,23 +72,40 @@ class WorkflowData {
 		this.focusedRef = focusedRef;
 	}
 
+	/**
+	 * length, return this.data.lenght
+	 */
 	get length() {
 		return this.data.length;
 	}
 
+	/**
+	 * setFocusedRef
+	 * This is useful when this WorkflowData used in state manner, 
+	 * For updateState in react this will clone object and set ref to cloned one.
+	 * @param {React.RefObject<any>} ref - ref of component that will recive focus.
+	 */
 	setFocusedRef(ref) {
 		let newWFData = this.clone();
 		newWFData.focusedRef = ref;
 		return newWFData;
 	}
 
+	/**
+	 * Creating and adding WorkflowItem to list need a unique ID,
+	 * newID make a new ID base on bigger id in the list + 1
+	 */
 	newID() {
 		let lastId = 0;
 		this.data.forEach(item => lastId = item.id > lastId ? item.id : lastId);
 		return lastId + 1;
 	}
 
-	validateID(id) {
+	/**
+	 * _validateID, private method, make sure id is valid in the list!
+	 * @param {number} id - An id to test 
+	 */
+	_validateID(id) {
 		let validate = false;
 		this.data.forEach(item => {
 			if (item.id === id)
@@ -87,6 +114,12 @@ class WorkflowData {
 		return validate;
 	}
 
+	/**
+	 * getLookingList, make a list of WorkflowItem's base on wfItem in tree.
+	 *
+	 * @param {number} id An id of WorkflowItem 
+	 * @returns {Array} Array of WorkflowItem
+	 */
 	getLookingList(id) {
 		let list;
 		let idIndex = findIDIndex(this.data, id);
@@ -101,6 +134,12 @@ class WorkflowData {
 		return list;
 	}
 
+	/**
+	 * Return a WorkflowItem if id is valid, otherwise returns null.
+	 *
+	 * @param {number} id An id of WorkflowItem 
+	 * @returns {WorkflowItem} founded WorkflowItem or null if id is invalid
+	 */
 	getByID(id) {
 		let idIndex = findIDIndex(this.data, id);
 		if (idIndex >= 0 && idIndex < this.length)
@@ -108,6 +147,13 @@ class WorkflowData {
 		return null;
 	}
 
+	/**
+	 * Find and return a React.RefObject forward, 
+	 * This help UI to determine next element to focus!
+	 *
+	 * @param {number} id Current WorkflowItem id
+	 * @returns {WorkflowItem} Next WorkflowItem.ref
+	 */
 	nextRef(id) {
 		if (this.tree === null || this.tree === undefined) {
 			console.log("nTREE is failed!");
@@ -130,6 +176,13 @@ class WorkflowData {
 		return null;
 	}
 
+	/**
+	 * Find and return a React.RefObject backward, 
+	 * This help UI to determine pervious element to focus!
+	 *
+	 * @param {number} id Current WorkflowItem id
+	 * @returns {WorkflowItem} Pervious WorkflowItem.ref
+	 */
 	previousRef(id) {
 		if (this.tree === null || this.tree === undefined) {
 			console.log("nTREE is failed!");
@@ -152,6 +205,13 @@ class WorkflowData {
 		}
 	}
 
+	/**
+	 * Find and return a WorkflowItem.id backward, 
+	 * To change indent of current WorkflowItem this id is needed!
+	 *
+	 * @param {number} id Current WorkflowItem id
+	 * @returns {number} Pervious WorkflowItem.id
+	 */
 	previousID(id) {
 		if (this.tree === null || this.tree === undefined) {
 			console.log("nTREE is failed!");
@@ -170,13 +230,23 @@ class WorkflowData {
 		}
 	}
 
+	/**
+	 * add new WorkflowItem to the list,
+	 * THIS METHOD DO NOTHING IF YOU WANT MAKE STATECHANGE
+	 * it just add an item to list, if stateChange is the matter use createUnderMyParent
+	 *
+	 * @param {string} title title of WorkflowItem
+	 * @param {number} parentID parentID of WorkflowItem, pass null to insert new item in root
+	 * @param {boolean} done pass true if WorkflowItem is done
+	 * @param {React.RefObject<any>} ref ref Element of WorkflowItem
+	 */
 	add(title, parentID, done, ref) {
 		let newID = this.newID();
 		if (this.length === 0 || parentID === null || parentID === undefined) {
 			this.data.push(new WorkflowItem(newID, title, null, done, ref));
 		} else {
 
-			if (!this.validateID(parentID))
+			if (!this._validateID(parentID))
 				return -1;
 
 			this.data.push(new WorkflowItem(
@@ -188,6 +258,11 @@ class WorkflowData {
 		return newID;
 	}
 
+	/**
+	 * Create a new WorkflowItem in the end of Parent.children and clone this instance
+	 * for stateChange!
+	 * @param {number} id parentID of current WorkflowItem.
+	 */
 	createUnderMyParent(id) {
 		let myParentID;
 		let newRef = React.createRef();
@@ -207,6 +282,11 @@ class WorkflowData {
 		return this.setFocusedRef(newRef);
 	}
 
+	/**
+	 * Delete WorkflowItem by its id, child nodes will deleted!
+	 *
+	 * @param {number} id id of WorkflowItem to be deleted
+	 */
 	deleteByID(id) {
 		let pWFRef = this.previousRef(id);
 		//console.log("delete -> pref:", pWFRef);
@@ -225,15 +305,30 @@ class WorkflowData {
 		return newWFData;
 	}
 
+	/**
+	 * Clone this WorkflowData instance to trigger stateChange!
+	 * @returns {WorkflowData} cloned WorkflowData
+	 */
 	clone() {
 		return new WorkflowData(this.data.map(wfItem => wfItem), this.focusedRef);
 	}
 
+	/**
+	 * Store the list to localStorage, do not call this method directly, 
+	 * this method triggers automaticall as needed
+	 */
 	store() {
 		let storeData = this.data.map(wfItem => wfItem.storeVersion());
 		localStorage.setItem('data', JSON.stringify(storeData));
 	}
 
+	/**
+	 * Restore the list from localStorage, method must calls directly, 
+	 * CALL IT BEFORE PASS THE WorkflowData TO useState OR SET IT TO State
+	 * this method will not trigger stateChange!
+	 * 
+	 * This will need to call in initiate of Application once and no more!
+	 */
 	restore() {
 		let strData = localStorage.getItem('data');
 		if (strData !== null && strData.length > 0) {
@@ -254,6 +349,12 @@ class WorkflowData {
 		}
 	}
 
+	/**
+	 * Set one of WorkflowItem's parent by its id, 
+	 * This will also clone the list to trigger stateChange!
+	 *
+	 * If id is invalid the current list will be returns.
+	 */
 	setWFItemParent(id, newParent) {
 		let idIndex = findIDIndex(this.data, id);
 
@@ -266,6 +367,12 @@ class WorkflowData {
 		return this;
 	}
 
+	/**
+	 * Set one of WorkflowItem's title by its id, 
+	 * This will also clone the list to trigger stateChange!
+	 *
+	 * If id is invalid the current list will be returns.
+	 */
 	setWFItemTitle(id, newTitle) {
 		let idIndex = findIDIndex(this.data, id);
 
@@ -278,6 +385,12 @@ class WorkflowData {
 		return this;
 	}
 
+	/**
+	 * Set one of WorkflowItem's done status by its id, 
+	 * This will also clone the list to trigger stateChange!
+	 *
+	 * If id is invalid the current list will be returns.
+	 */
 	setWFItemDone(id, newDone) {
 		let idIndex = findIDIndex(this.data, id);
 
@@ -290,6 +403,11 @@ class WorkflowData {
 		return this;
 	}
 
+	/**
+	 * Make a hierarchy tree of current list items and returns the tree,
+	 * Also this will update this.tree and this._mappedWFs to use later in 
+	 * nextRef, previousRef and previousID.
+	 */
 	makeTree() {
 		if (this.length === 0)
 			return [];

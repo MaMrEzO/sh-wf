@@ -37,19 +37,29 @@ class WorkflowItem {
 	}
 }
 
+function findIDIndex(list, id) {
+	if (!Array.isArray(list))
+		return -1;
+	let res = -1;
+	list.forEach((item, index) => {
+		if (item.id === id)
+			res = index;
+	})
+	return res;
+}
+
 class WorkflowData {
 	constructor(data, focusedRef) {
 		if (data !== null && data !== undefined && Array.isArray(data)) {
 			this.data = data;
-			this.tree = this.makeTree();
+			this.makeTree();
 		} else {
 			this.data = [];
-			/*console.error("WHAT");*/
 			this.tree = [];
+			this._mappedWFs = new Map();
 		}
 
 		this.focusedRef = focusedRef;
-		/*console.log("Constructed :", this);*/
 	}
 
 	get length() {
@@ -77,19 +87,22 @@ class WorkflowData {
 		return validate;
 	}
 
-	idIndex(id) {
-		let res = -1;
-		this.data.forEach((wf_item, index) => {
-			if (wf_item.id === id)
-				res = index;
-		});
-		//console.log(this.tree, this.data);
-		//console.log("Has child: ", this.data[res].children ? true : false, this.data[res].children ? this.data[res].children : []);
-		return res;
+	getLookingList(id) {
+		let list;
+		let idIndex = findIDIndex(this.data, id);
+		if (idIndex >= 0 && idIndex < this.length) {
+			let wfItem = this.data[idIndex];
+			if (wfItem.parentID !== null) {
+				list = this._mappedWFs.get(wfItem.parentID).children;
+			} else {
+				list = this.tree;
+			}
+		}
+		return list;
 	}
 
 	getByID(id) {
-		let idIndex = this.idIndex(id);
+		let idIndex = findIDIndex(this.data, id);
 		if (idIndex >= 0 && idIndex < this.length)
 			return this.data[idIndex];
 		return null;
@@ -99,38 +112,62 @@ class WorkflowData {
 		if (this.tree === null || this.tree === undefined) {
 			console.log("nTREE is failed!");
 		}
-		let idIndex = this.idIndex(id);
-		if (idIndex >= 0 && idIndex < this.length - 1) {
-			return this.data[idIndex + 1].ref
+		let lookingList = this.getLookingList(id);
+		let idIndex = findIDIndex(lookingList, id);
+		let wfItem = this._mappedWFs.get(id);
+		if (wfItem.children && wfItem.children.length > 0) {
+			return wfItem.children[0].ref;
+		} else if (idIndex < lookingList.length - 1) {
+			return lookingList[idIndex + 1].ref;
+		} else if (wfItem.parentID != null) {
+			id = wfItem.parentID;
+			let lookingList = this.getLookingList(id);
+			let idIndex = findIDIndex(lookingList, id);
+			if (idIndex < lookingList.length - 1) {
+				return lookingList[idIndex + 1].ref;
+			}
 		}
-		return null
-	}
-
-	nextID(id) {
-		let idIndex = this.idIndex(id);
-		if (idIndex >= 0 && idIndex < this.length - 1) {
-			return this.data[idIndex + 1].id
-		}
-		return -1
+		return null;
 	}
 
 	previousRef(id) {
 		if (this.tree === null || this.tree === undefined) {
 			console.log("nTREE is failed!");
 		}
-		let idIndex = this.idIndex(id);
-		if (idIndex > 0 && idIndex < this.length) {
-			return this.data[idIndex - 1].ref
+		let lookingList = this.getLookingList(id);
+		let idIndex = findIDIndex(lookingList, id);
+		let wfItem = this.getByID(id);
+		if (idIndex === 0) {
+			if (wfItem.parentID != null)
+				return this.getByID(wfItem.parentID).ref;
+			else
+				return wfItem.ref;
+		} else {
+			let pwf = lookingList[idIndex - 1];
+			while (this._mappedWFs.get(pwf.id).children) {
+				let children = this._mappedWFs.get(pwf.id).children;
+				pwf = children[children.length - 1];
+			}
+			return pwf.ref;
 		}
-		return null
 	}
 
 	previousID(id) {
-		let idIndex = this.idIndex(id);
-		if (idIndex > 0 && idIndex < this.length) {
-			return this.data[idIndex - 1].id
+		if (this.tree === null || this.tree === undefined) {
+			console.log("nTREE is failed!");
 		}
-		return null
+		let lookingList = this.getLookingList(id);
+		let idIndex = findIDIndex(lookingList, id);
+		let wfItem = this.getByID(id);
+		if (idIndex === 0) {
+			if (wfItem.parentID != null)
+				return this.getByID(wfItem.parentID).id;
+			else
+				return wfItem.id;
+		} else {
+			let pwf = lookingList[idIndex - 1];
+			return pwf.id;
+		}
 	}
 
 	add(title, parentID, done, ref) {
@@ -172,7 +209,7 @@ class WorkflowData {
 
 	deleteByID(id) {
 		let pWFRef = this.previousRef(id);
-		console.log("delete -> pref:", pWFRef);
+		//console.log("delete -> pref:", pWFRef);
 		let newData = [];
 		let ignoreList = [id];
 		this.data.forEach(wfItem => {
@@ -217,7 +254,7 @@ class WorkflowData {
 	}
 
 	setWFItemParent(id, newParent) {
-		let idIndex = this.idIndex(id);
+		let idIndex = findIDIndex(this.data, id);
 
 		if (idIndex >= 0 && idIndex < this.length) {
 			this.data[idIndex].parentID = newParent;
@@ -229,7 +266,7 @@ class WorkflowData {
 	}
 
 	setWFItemTitle(id, newTitle) {
-		let idIndex = this.idIndex(id);
+		let idIndex = findIDIndex(this.data, id);
 
 		if (idIndex >= 0 && idIndex < this.length) {
 			this.data[idIndex].title = newTitle;
@@ -241,7 +278,7 @@ class WorkflowData {
 	}
 
 	setWFItemDone(id, newDone) {
-		let idIndex = this.idIndex(id);
+		let idIndex = findIDIndex(this.data, id);
 
 		if (idIndex >= 0) {
 			this.data[idIndex].done = newDone;
@@ -268,7 +305,8 @@ class WorkflowData {
 			}
 			else dataTree.push(mappedWFItems.get(wfItem.id));
 		});
-		console.log(this.data[0], dataTree[0]);
+		this.tree = dataTree;
+		this._mappedWFs = mappedWFItems;
 		return dataTree;
 	}
 }

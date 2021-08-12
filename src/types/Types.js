@@ -8,6 +8,10 @@ export class State {
 }
 
 class WorkflowItem {
+	/**
+	 * @constructor
+	 * Construct a new instance of WorkflowItem
+	 */
 	constructor(id, title, parentID, done, ref) {
 		this.id = id;
 		this.title = title;
@@ -16,6 +20,9 @@ class WorkflowItem {
 		this.ref = ref;
 	}
 
+	/**
+	 * Make a deep clone of WorkflowItem
+	 */
 	clone() {
 		return new WorkflowItem(
 			this.id,
@@ -26,6 +33,9 @@ class WorkflowItem {
 		)
 	}
 
+	/**
+	 * Make a clone of WorkflowItem without ref
+	 */
 	storeVersion() {
 		return new WorkflowItem(
 			this.id,
@@ -37,6 +47,12 @@ class WorkflowItem {
 	}
 }
 
+/**
+ * Find an item in provided list(Arra of WorkflowItem) with id an return index of item in list
+ * 
+ * @param {Array} list Array of WorkflowItem
+ * @param {number} id ID of WorkflowItem to find
+ */
 function findIDIndex(list, id) {
 	if (!Array.isArray(list))
 		return -1;
@@ -54,6 +70,7 @@ function findIDIndex(list, id) {
  *
  * To instance a naw and empty WorkflowData just call new WorkflowData(),
  *
+ * @constructor
  * @param {WorkflowItem[]} data - List data of WorkflowItem's for new WorkflowData instance
  * @param {React.RefObject<any>} focusedRef - Focused ref in app, ignore it if none
  *

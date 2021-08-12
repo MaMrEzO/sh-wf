@@ -159,6 +159,21 @@ class WorkflowData {
 		return this.setFocusedRef(newRef);
 	}
 
+	deleteByID(id) {
+		let pWFRef = this.previousRef(id);
+		console.log("delete -> pref:", pWFRef);
+		let newData = [];
+		let ignoreList = [id];
+		this.data.forEach(wfItem => {
+			//Ignore the items with the id and items under it
+			if (wfItem.parentID === id)
+				ignoreList.push(wfItem.id);
+			if (!ignoreList.includes(wfItem.id))
+				newData.push(wfItem);
+		});
+		return new WorkflowData(newData, pWFRef);
+	}
+
 	clone() {
 		/*console.log("CLONE, fc:", this.focusedRef);*/
 		return new WorkflowData(this.data.map(wfItem => wfItem), this.focusedRef);

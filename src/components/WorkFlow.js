@@ -32,7 +32,11 @@ export function WorkFlowRow(props) {
 		let id = Number.parseInt(e.target.id);
 		let wfItem = state.state.getByID(id);
 		switch (e.keyCode) {
-			case 9:
+			case 8://BackSpace
+				if (item.title === "")
+					state.dispatcher(state.state.deleteByID(id));
+				break;
+			case 9://Tab
 				if (e.shiftKey) {
 					if (wfItem.parentID !== null) {
 						let pwf = state.state.getByID(wfItem.parentID);
@@ -79,7 +83,12 @@ export function WorkFlowRow(props) {
 					state.dispatcher(state.state.setFocusedRef(el_ref));
 					handled = true;
 				}
-
+				break;
+			case 46://Delete
+				if (e.shiftKey && e.ctrlKey) {
+					state.dispatcher(state.state.deleteByID(id));
+					handled = true;
+				}
 				break;
 			default:
 				console.log("Unhandled: ", e.keyCode)

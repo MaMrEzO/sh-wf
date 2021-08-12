@@ -22,4 +22,4 @@ This project just manipulate workflows in list style, in order and tree like bul
 
 ## Known issuses
  - Navigation get confused on changeing indent backward items in middle of list! 
- - Added items with `Enter` key will inserted after parent of current item and end, not under current item.
+ - Added items with `Enter` key will inserted after currentItem->Parent.Children, not under current item.

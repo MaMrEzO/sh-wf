@@ -1,0 +1,37 @@
+.AddButton {
+	position: relative;
+	border-radius: 1.25rem;
+	border: none;
+	display: block;
+	height: 2.5rem;
+	font-size: 1.5rem;
+	cursor: pointer;
+	background-color: #bd93f9;
+	color: white;
+	margin-top: 0.75rem;
+	padding-right: 2.1rem;
+}
+
+.AddButton::before {
+	content: "+";
+	position: absolute;
+	top: 0.4rem;
+	right: 0.8rem;
+}
+
+.AddButtonTitle {
+	display: inline-block;
+	font-size: 1.2rem;
+	line-height: 2.5rem;
+	margin-left: 0px;
+	overflow: hidden;
+	transition: all 100ms;
+	width: 0px;	
+	text-overflow: clip;
+	white-space: nowrap;
+}
+
+.AddButton:hover .AddButtonTitle {
+	margin-left: 0.5rem;
+	width: 5rem;
+}

@@ -1,0 +1,34 @@
+.workflow-box{
+	margin-left: 1rem;
+}
+
+.workflow-box .workflow-box {
+	margin-left: 2rem;
+}
+
+.workflow-row {
+	display: block;
+	position: relative;
+}
+
+.workflow-row input {
+	width: 100%;
+	background-color: transparent;
+	border: none;
+	color: white;
+	outline: none;
+}
+
+.workflow-row::before {
+	content: "•";
+	position: absolute;
+	left: -1rem;
+	top: -0.85rem;
+	font-size: 2rem;
+	color: white;
+}
+
+.workflow-row input.done {
+	color: #576592;
+	text-decoration: line-through;
+}

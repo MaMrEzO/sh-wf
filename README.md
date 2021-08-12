@@ -2,6 +2,7 @@
 
 This project just manipulate workflows in list style, in order and tree like bullet list.
 ## Implemented
+- [x] Adding with add button
 - [x] Adding with `Enter`
 - [X] Done with `Ctrl-Enter`
 - [x] Keyboard navigation

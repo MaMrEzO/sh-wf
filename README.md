@@ -7,7 +7,9 @@ This project just manipulate workflows in list style, in order and tree like bul
 - [x] Done with `Ctrl-Enter`
 - [x] Delete item with `Backspace` on empty title and `Shift+Ctrl+Del` on any item.
 - [x] Keyboard navigation
+- [x] Store and restore to and from localStorage.
 
+## Shortcuts
 
 | Condition | Key | Action |
 |---|---|---|
@@ -18,9 +20,6 @@ This project just manipulate workflows in list style, in order and tree like bul
 | normal | `UpArrow`/`DownArrow` | navigate upward and downward between Workflow |
 | normal | `Shift+Ctrl+Del` | Delete node (with children) |
 | Empty title | `Backspace` | Delete node (with children) |
-
-## Todo
-- [ ] Store on add or delete to localStorage
 
 ## Known issuses
  - Navigation get confused on changeing indent backward items in middle of list! 

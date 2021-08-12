@@ -214,8 +214,9 @@ class WorkflowData {
 		let ignoreList = [id];
 		this.data.forEach(wfItem => {
 			//Ignore the items with the id and items under it
-			if (wfItem.parentID === id)
+			if (ignoreList.includes(wfItem.parentID))
 				ignoreList.push(wfItem.id);
+
 			if (!ignoreList.includes(wfItem.id))
 				newData.push(wfItem);
 		});

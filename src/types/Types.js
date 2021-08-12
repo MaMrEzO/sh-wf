@@ -25,6 +25,16 @@ class WorkflowItem {
 			this.ref,
 		)
 	}
+
+	storeVersion() {
+		return new WorkflowItem(
+			this.id,
+			this.title,
+			this.parentID,
+			this.done,
+			null
+		)
+	}
 }
 
 class WorkflowData {
@@ -156,6 +166,7 @@ class WorkflowData {
 			false,
 			newRef
 		));
+		this.store();
 		return this.setFocusedRef(newRef);
 	}
 
@@ -171,16 +182,38 @@ class WorkflowData {
 			if (!ignoreList.includes(wfItem.id))
 				newData.push(wfItem);
 		});
-		return new WorkflowData(newData, pWFRef);
+		let newWFData = new WorkflowData(newData, pWFRef);
+		newWFData.store();
+		return newWFData;
 	}
 
 	clone() {
-		/*console.log("CLONE, fc:", this.focusedRef);*/
 		return new WorkflowData(this.data.map(wfItem => wfItem), this.focusedRef);
 	}
 
-	deepClone() {
-		return new WorkflowData(this.data.map(wfItem => wfItem.clone()))
+	store() {
+		let storeData = this.data.map(wfItem => wfItem.storeVersion());
+		localStorage.setItem('data', JSON.stringify(storeData));
+	}
+
+	restore() {
+		let strData = localStorage.getItem('data');
+		if (strData !== null && strData.length > 0) {
+			let data = JSON.parse(strData);
+			if (data !== null) {
+				let newWFData = data.map(swfitem => new WorkflowItem(
+					swfitem.id,
+					swfitem.title,
+					swfitem.parentID,
+					swfitem.done,
+					React.createRef()
+				));
+				this.data = newWFData;
+				this.tree = this.makeTree();
+				if (this.length > 0)
+					this.focusedRef = this.data[0].ref;
+			}
+		}
 	}
 
 	setWFItemParent(id, newParent) {
@@ -188,7 +221,9 @@ class WorkflowData {
 
 		if (idIndex >= 0 && idIndex < this.length) {
 			this.data[idIndex].parentID = newParent;
-			return this.clone();
+			let newWFData = this.clone();
+			newWFData.store();
+			return newWFData;
 		}
 		return this;
 	}
@@ -198,7 +233,9 @@ class WorkflowData {
 
 		if (idIndex >= 0 && idIndex < this.length) {
 			this.data[idIndex].title = newTitle;
-			return this.clone();
+			let newWFData = this.clone();
+			newWFData.store();
+			return newWFData;
 		}
 		return this;
 	}
@@ -208,7 +245,9 @@ class WorkflowData {
 
 		if (idIndex >= 0) {
 			this.data[idIndex].done = newDone;
-			return this.clone();
+			let newWFData = this.clone();
+			newWFData.store();
+			return newWFData;
 		}
 		return this;
 	}

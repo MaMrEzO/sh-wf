@@ -73,8 +73,8 @@ class WorkflowData {
 			if (wf_item.id === id)
 				res = index;
 		});
-		console.log(this.tree, this.data);
-		console.log("Has child: ", this.data[res].children ? true : false, this.data[res].children ? this.data[res].children : []);
+		//console.log(this.tree, this.data);
+		//console.log("Has child: ", this.data[res].children ? true : false, this.data[res].children ? this.data[res].children : []);
 		return res;
 	}
 
@@ -142,8 +142,13 @@ class WorkflowData {
 	}
 
 	createUnderMyParent(id) {
-		let myParentID = this.getByID(id).parentID;
+		let myParentID;
 		let newRef = React.createRef();
+		if (id === null) {
+			myParentID = null;
+		} else {
+			myParentID = this.getByID(id).parentID;
+		}
 		this.data.push(new WorkflowItem(
 			this.newID(),
 			"",

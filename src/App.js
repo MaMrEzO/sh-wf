@@ -21,11 +21,15 @@ function App() {
 	const tree = store.makeTree();
 	//console.log("tree: ", store, tree);
 
+	const onCreate = () => {
+		setStore(store.createUnderMyParent(null));
+	}
+
 	return (
 		<div className="App">
 			<div key="AppTitle" className="AppTitle">Workflow</div>
 			<WorkFlowBox key="wfMasterBox" data={tree} state={state} />
-			<AddButton key="AddButton" onClick={() => {alert("Adding...")}} />
+			<AddButton key="AddButton" onClick={() => onCreate()} />
 		</div>
 	);
 }

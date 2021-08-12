@@ -4,21 +4,23 @@ This project just manipulate workflows in list style, in order and tree like bul
 ## Implemented
 - [x] Adding with add button
 - [x] Adding with `Enter`
-- [X] Done with `Ctrl-Enter`
+- [x] Done with `Ctrl-Enter`
+- [x] Delete item with `Backspace` on empty title and `Shift+Ctrl+Del` on any item.
 - [x] Keyboard navigation
 
 
-| Key | Action |
-|---|---|
-| `Enter` | new Workflow. |
-| `Ctrl+Enter` | make focused Workflow done. |
-| `Tab` | Change indent of Workflow forward. |
-| `Shift+Tab` | change indent forward. |
-| `UpArrow`/`DownArrow` | navigate upward and downward between Workflow |
+| Condition | Key | Action |
+|---|---|---|
+| normal | `Enter` | new Workflow. |
+| normal | `Ctrl+Enter` | make focused Workflow done. |
+| normal | `Tab` | Change indent of Workflow forward. |
+| normal | `Shift+Tab` | change indent forward. |
+| normal | `UpArrow`/`DownArrow` | navigate upward and downward between Workflow |
+| normal | `Shift+Ctrl+Del` | Delete node (with children) |
+| Empty title | `Backspace` | Delete node (with children) |
 
 ## Todo
 - [ ] Store on add or delete to localStorage
-- [ ] Delete on empty title with `BackSpace` or `Ctrl+Shift+Delete`
 
 ## Known issuses
  - Navigation get confused on changeing indent backward items in middle of list! 

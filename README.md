@@ -4,7 +4,7 @@ This project just manipulate workflows in list style, in order and tree like bul
 ## Implemented
 - [x] Documentation of Components and API in code
 - [x] Adding with add button
-- [x] Adding with `Enter`
+- [x] Adding with `Enter` under current item
 - [x] Done with `Ctrl-Enter`
 - [x] Delete item with `Backspace` on empty title and `Shift+Ctrl+Del` on any item.
 - [x] Keyboard navigation
@@ -21,6 +21,3 @@ This project just manipulate workflows in list style, in order and tree like bul
 | normal | `UpArrow`/`DownArrow` | navigate upward and downward between Workflow |
 | normal | `Shift+Ctrl+Del` | Delete node (with children) |
 | Empty title | `Backspace` | Delete node (with children) |
-
-## Known issuses
- - Added items with `Enter` key will inserted after currentItem->Parent.Children, not under current item.

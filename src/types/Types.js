@@ -12,10 +12,11 @@ class WorkflowItem {
 	 * @constructor
 	 * Construct a new instance of WorkflowItem
 	 */
-	constructor(id, title, parentID, done, ref) {
+	constructor(id, title, parentID, order, done, ref) {
 		this.id = id;
 		this.title = title;
 		this.parentID = parentID;
+		this.order = order;
 		this.done = done;
 		this.ref = ref;
 	}
@@ -28,6 +29,7 @@ class WorkflowItem {
 			this.id,
 			this.title,
 			this.parentID,
+			this.order,
 			this.done,
 			this.ref,
 		)
@@ -41,6 +43,7 @@ class WorkflowItem {
 			this.id,
 			this.title,
 			this.parentID,
+			this.order,
 			this.done,
 			null
 		)
@@ -62,6 +65,14 @@ function findIDIndex(list, id) {
 			res = index;
 	})
 	return res;
+}
+
+function sortChildren(children) {
+	children.forEach(cwfItem => {
+		if(cwfItem.children && cwfItem.children.length)
+			cwfItem.children = sortChildren(cwfItem.children)
+	});
+	return children.sort((l, r) => l.order - r.order);
 }
 
 /**
@@ -260,15 +271,17 @@ class WorkflowData {
 	add(title, parentID, done, ref) {
 		let newID = this.newID();
 		if (this.length === 0 || parentID === null || parentID === undefined) {
-			this.data.push(new WorkflowItem(newID, title, null, done, ref));
+			this.data.push(new WorkflowItem(newID, title, null, null, done, ref));
 		} else {
 
 			if (!this._validateID(parentID))
 				return -1;
 
+			let parentChildren = this.data.filter(wfItem => wfItem.parentID === parentID);
+			
 			this.data.push(new WorkflowItem(
 				newID,
-				title, parentID, done, ref
+				title, parentID, parentChildren.length, done, ref
 			));
 		}
 		this.tree = this.makeTree();
@@ -282,16 +295,25 @@ class WorkflowData {
 	 */
 	createUnderMyParent(id) {
 		let myParentID;
+		let myOrder;
 		let newRef = React.createRef();
 		if (id === null) {
 			myParentID = null;
 		} else {
-			myParentID = this.getByID(id).parentID;
+			let me = this.getByID(id);
+			myParentID = me.parentID;
+			myOrder = me.order;
+			this.data.forEach(wfItem => {
+				if(wfItem.parentID === myParentID && wfItem.order > myOrder){
+					wfItem.order = wfItem.order + 1;
+				}
+			})
 		}
 		this.data.push(new WorkflowItem(
 			this.newID(),
 			"",
 			myParentID,
+			myOrder + 1,
 			false,
 			newRef
 		));
@@ -306,7 +328,6 @@ class WorkflowData {
 	 */
 	deleteByID(id) {
 		let pWFRef = this.previousRef(id);
-		//console.log("delete -> pref:", pWFRef);
 		let newData = [];
 		let ignoreList = [id];
 		this.data.forEach(wfItem => {
@@ -355,6 +376,7 @@ class WorkflowData {
 					swfitem.id,
 					swfitem.title,
 					swfitem.parentID,
+					swfitem.order,
 					swfitem.done,
 					React.createRef()
 				));
@@ -376,7 +398,15 @@ class WorkflowData {
 		let idIndex = findIDIndex(this.data, id);
 
 		if (idIndex >= 0 && idIndex < this.length) {
+			let parentChildren = this.data.filter(wfItem => wfItem.parentID === newParent);
+			let newOrder = 0;
+			if(parentChildren.length > 0)
+				parentChildren.forEach(cwfItem => {
+					if(cwfItem.order > newOrder)
+						newOrder = cwfItem.order + 1;
+				});
 			this.data[idIndex].parentID = newParent;
+			this.data[idIndex].order = newOrder;
 			let newWFData = this.clone();
 			newWFData.store();
 			return newWFData;
@@ -440,6 +470,12 @@ class WorkflowData {
 				mfwItem.children.push(mappedWFItems.get(wfItem.id));
 			}
 			else dataTree.push(mappedWFItems.get(wfItem.id));
+		});
+		//Sort children via order prop!
+		dataTree.forEach(twfItem => {
+			if(twfItem.children && twfItem.children.length > 0){
+				twfItem.children = sortChildren(twfItem.children); 
+			}
 		});
 		this.tree = dataTree;
 		this._mappedWFs = mappedWFItems;
